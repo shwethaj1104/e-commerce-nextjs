@@ -1,0 +1,14 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(npx create-next-app@latest . --typescript --tailwind --eslint --app --src-dir --import-alias \"@/*\")",
+      "Bash(rm README.md)",
+      "Bash(npm install @tanstack/react-query react-intersection-observer framer-motion leaflet react-leaflet)",
+      "Bash(npm install -D @types/leaflet)",
+      "Bash(npm install @heroicons/react)",
+      "Bash(npm run dev)"
+    ],
+    "deny": [],
+    "ask": []
+  }
+}
