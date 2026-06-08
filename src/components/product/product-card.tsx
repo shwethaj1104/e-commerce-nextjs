@@ -1,0 +1,85 @@
+import Link from 'next/link';
+import Image from 'next/image';
+import { Product } from '@/lib/types';
+import { StarIcon, ShoppingCartIcon } from '@heroicons/react/24/solid';
+import { StarIcon as StarOutlineIcon } from '@heroicons/react/24/outline';
+
+interface ProductCardProps {
+  product: Product;
+}
+
+export default function ProductCard({ product }: ProductCardProps) {
+  const discountedPrice = product.price * (1 - product.discountPercentage / 100);
+  const fullStars = Math.floor(product.rating);
+  const hasHalfStar = product.rating % 1 !== 0;
+
+  return (
+    <div className="bg-white rounded-lg shadow-md overflow-hidden hover:shadow-lg transition-shadow group">
+      <Link href={`/products/${product.id}`}>
+        <div className="relative h-64 bg-gray-100">
+          <Image
+            src={product.thumbnail}
+            alt={product.title}
+            fill
+            className="object-cover group-hover:scale-105 transition-transform duration-300"
+            sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 25vw"
+          />
+          {product.discountPercentage > 0 && (
+            <div className="absolute top-2 right-2 bg-red-500 text-white px-2 py-1 rounded-md text-sm font-semibold">
+              -{Math.round(product.discountPercentage)}%
+            </div>
+          )}
+        </div>
+      </Link>
+
+      <div className="p-4">
+        <Link href={`/products/${product.id}`}>
+          <h3 className="font-semibold text-gray-900 mb-2 line-clamp-2 hover:text-blue-600 transition-colors">
+            {product.title}
+          </h3>
+        </Link>
+
+        <div className="flex items-center mb-2">
+          <div className="flex items-center">
+            {[...Array(5)].map((_, i) => {
+              if (i < fullStars) {
+                return <StarIcon key={i} className="h-4 w-4 text-yellow-400" />;
+              } else if (i === fullStars && hasHalfStar) {
+                return <StarIcon key={i} className="h-4 w-4 text-yellow-400" />;
+              } else {
+                return <StarOutlineIcon key={i} className="h-4 w-4 text-gray-300" />;
+              }
+            })}
+          </div>
+          <span className="text-sm text-gray-600 ml-2">({product.rating})</span>
+        </div>
+
+        <div className="flex items-center justify-between mb-3">
+          <div className="flex items-center space-x-2">
+            <span className="text-lg font-bold text-gray-900">
+              ${discountedPrice.toFixed(2)}
+            </span>
+            {product.discountPercentage > 0 && (
+              <span className="text-sm text-gray-500 line-through">
+                ${product.price.toFixed(2)}
+              </span>
+            )}
+          </div>
+          <span className="text-sm text-gray-600">{product.brand}</span>
+        </div>
+
+        <div className="flex items-center justify-between">
+          <span className="text-sm text-gray-600">
+            {product.stock > 0 ? `${product.stock} in stock` : 'Out of stock'}
+          </span>
+          <button
+            className="bg-blue-600 text-white p-2 rounded-lg hover:bg-blue-700 transition-colors disabled:bg-gray-400 disabled:cursor-not-allowed"
+            disabled={product.stock === 0}
+          >
+            <ShoppingCartIcon className="h-4 w-4" />
+          </button>
+        </div>
+      </div>
+    </div>
+  );
+}
