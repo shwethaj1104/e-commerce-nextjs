@@ -3,9 +3,12 @@
 import Link from 'next/link';
 import { useState } from 'react';
 import { ShoppingCartIcon, MagnifyingGlassIcon, Bars3Icon, XMarkIcon } from '@heroicons/react/24/outline';
+import { useCart } from '@/contexts/cart-context';
 
 export default function Header() {
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
+  const { getItemCount } = useCart();
+  const itemCount = getItemCount();
 
   return (
     <header className="bg-white shadow-md sticky top-0 z-50">
@@ -39,11 +42,13 @@ export default function Header() {
               />
             </div>
 
-            <Link href="/cart" className="relative p-2">
+            <Link href="/cart" className="relative p-2 group">
               <ShoppingCartIcon className="h-6 w-6 text-gray-700 hover:text-blue-600 transition-colors" />
-              <span className="absolute -top-1 -right-1 bg-red-500 text-white text-xs rounded-full h-5 w-5 flex items-center justify-center">
-                0
-              </span>
+              {itemCount > 0 && (
+                <span className="absolute -top-1 -right-1 bg-blue-600 text-white text-xs rounded-full h-5 w-5 flex items-center justify-center font-semibold group-hover:bg-blue-700 transition-colors animate-pulse">
+                  {itemCount > 99 ? '99+' : itemCount}
+                </span>
+              )}
             </Link>
 
             <button
