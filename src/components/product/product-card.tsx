@@ -2,16 +2,25 @@ import Link from 'next/link';
 import Image from 'next/image';
 import { Product } from '@/lib/types';
 import { StarIcon, ShoppingCartIcon } from '@heroicons/react/24/solid';
-import { StarIcon as StarOutlineIcon } from '@heroicons/react/24/outline';
+import { StarIcon as StarOutlineIcon, ShoppingCartIcon as ShoppingCartOutlineIcon } from '@heroicons/react/24/outline';
+import { useCart } from '@/contexts/cart-context';
 
 interface ProductCardProps {
   product: Product;
 }
 
 export default function ProductCard({ product }: ProductCardProps) {
+  const { addItem, isInCart } = useCart();
   const discountedPrice = product.price * (1 - product.discountPercentage / 100);
   const fullStars = Math.floor(product.rating);
   const hasHalfStar = product.rating % 1 !== 0;
+  const inCart = isInCart(product.id);
+
+  const handleAddToCart = () => {
+    if (!inCart) {
+      addItem(product);
+    }
+  };
 
   return (
     <div className="bg-white rounded-lg shadow-md overflow-hidden hover:shadow-lg transition-shadow group">
@@ -73,10 +82,22 @@ export default function ProductCard({ product }: ProductCardProps) {
             {product.stock > 0 ? `${product.stock} in stock` : 'Out of stock'}
           </span>
           <button
-            className="bg-blue-600 text-white p-2 rounded-lg hover:bg-blue-700 transition-colors disabled:bg-gray-400 disabled:cursor-not-allowed"
+            onClick={handleAddToCart}
+            className={`p-2 rounded-lg transition-all duration-300 disabled:cursor-not-allowed ${
+              inCart
+                ? 'bg-green-600 text-white hover:bg-green-700 shadow-lg'
+                : product.stock === 0
+                ? 'bg-gray-400 text-white cursor-not-allowed'
+                : 'border-2 border-blue-600 text-blue-600 hover:bg-blue-600 hover:text-white'
+            }`}
             disabled={product.stock === 0}
+            title={inCart ? 'Added to cart' : 'Add to cart'}
           >
-            <ShoppingCartIcon className="h-4 w-4" />
+            {inCart ? (
+              <ShoppingCartIcon className="h-4 w-4" />
+            ) : (
+              <ShoppingCartOutlineIcon className="h-4 w-4" />
+            )}
           </button>
         </div>
       </div>
