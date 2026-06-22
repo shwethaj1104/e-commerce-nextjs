@@ -45,3 +45,24 @@ export interface PaginationProps {
   totalPages: number;
   onPageChange: (page: number) => void;
 }
+
+export interface CartItem {
+  id: number;
+  title: string;
+  price: number;
+  discountPercentage: number;
+  thumbnail: string;
+  quantity: number;
+  brand: string;
+}
+
+export interface CartContextType {
+  items: CartItem[];
+  addItem: (product: Product) => void;
+  removeItem: (id: number) => void;
+  updateQuantity: (id: number, quantity: number) => void;
+  clearCart: () => void;
+  getItemCount: () => number;
+  getTotalPrice: () => number;
+  isInCart: (id: number) => boolean;
+}
