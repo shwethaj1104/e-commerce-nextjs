@@ -1,7 +1,7 @@
 import Link from 'next/link';
 import Image from 'next/image';
 import { Product } from '@/lib/types';
-import { StarIcon, ShoppingCartIcon } from '@heroicons/react/24/solid';
+import { StarIcon, MinusIcon, PlusIcon } from '@heroicons/react/24/solid';
 import { StarIcon as StarOutlineIcon, ShoppingCartIcon as ShoppingCartOutlineIcon } from '@heroicons/react/24/outline';
 import { useCart } from '@/contexts/cart-context';
 
@@ -10,16 +10,28 @@ interface ProductCardProps {
 }
 
 export default function ProductCard({ product }: ProductCardProps) {
-  const { addItem, isInCart } = useCart();
+  const { addItem, isInCart, items, updateQuantity } = useCart();
   const discountedPrice = product.price * (1 - product.discountPercentage / 100);
   const fullStars = Math.floor(product.rating);
   const hasHalfStar = product.rating % 1 !== 0;
   const inCart = isInCart(product.id);
+  const cartItem = items.find(item => item.id === product.id);
+  const quantity = cartItem?.quantity ?? 0;
 
   const handleAddToCart = () => {
     if (!inCart) {
       addItem(product);
     }
+  };
+
+  const handleDecrement = (e: React.MouseEvent) => {
+    e.preventDefault();
+    updateQuantity(product.id, quantity - 1);
+  };
+
+  const handleIncrement = (e: React.MouseEvent) => {
+    e.preventDefault();
+    addItem(product);
   };
 
   return (
@@ -81,24 +93,40 @@ export default function ProductCard({ product }: ProductCardProps) {
           <span className="text-sm text-gray-600">
             {product.stock > 0 ? `${product.stock} in stock` : 'Out of stock'}
           </span>
-          <button
-            onClick={handleAddToCart}
-            className={`p-2 rounded-lg transition-all duration-300 disabled:cursor-not-allowed ${
-              inCart
-                ? 'bg-green-600 text-white hover:bg-green-700 shadow-lg'
-                : product.stock === 0
-                ? 'bg-gray-400 text-white cursor-not-allowed'
-                : 'border-2 border-blue-600 text-blue-600 hover:bg-blue-600 hover:text-white'
-            }`}
-            disabled={product.stock === 0}
-            title={inCart ? 'Added to cart' : 'Add to cart'}
-          >
-            {inCart ? (
-              <ShoppingCartIcon className="h-4 w-4" />
-            ) : (
+          {inCart ? (
+            <div className="flex items-center gap-1 bg-green-600 rounded-lg shadow-lg overflow-hidden">
+              <button
+                onClick={handleDecrement}
+                className="px-2 py-2 text-white hover:bg-green-700 transition-colors"
+                title="Remove one"
+              >
+                <MinusIcon className="h-3 w-3" />
+              </button>
+              <span className="px-1 text-white text-sm font-semibold min-w-[20px] text-center">
+                {quantity}
+              </span>
+              <button
+                onClick={handleIncrement}
+                className="px-2 py-2 text-white hover:bg-green-700 transition-colors"
+                title="Add one more"
+              >
+                <PlusIcon className="h-3 w-3" />
+              </button>
+            </div>
+          ) : (
+            <button
+              onClick={handleAddToCart}
+              className={`p-2 rounded-lg transition-all duration-300 disabled:cursor-not-allowed ${
+                product.stock === 0
+                  ? 'bg-gray-400 text-white cursor-not-allowed'
+                  : 'border-2 border-blue-600 text-blue-600 hover:bg-blue-600 hover:text-white'
+              }`}
+              disabled={product.stock === 0}
+              title="Add to cart"
+            >
               <ShoppingCartOutlineIcon className="h-4 w-4" />
-            )}
-          </button>
+            </button>
+          )}
         </div>
       </div>
     </div>
